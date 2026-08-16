@@ -43,6 +43,10 @@
                                 Margin="0,0,8,0" Click="BtnSettings_Click"/>
                         <Button x:Name="BtnReview" Content="审阅" Style="{StaticResource NeonButton}"
                                 Margin="0,0,8,0" Click="BtnReview_Click" IsEnabled="False"/>
+                        <Button x:Name="BtnPlayback" Content="▶ 播放录音" Style="{StaticResource NeonButton}"
+                                Margin="0,0,8,0" Click="BtnPlayback_Click" IsEnabled="False"/>
+                        <Button x:Name="BtnRetranslate" Content="重新翻译" Style="{StaticResource NeonButton}"
+                                Margin="0,0,8,0" Click="BtnRetranslate_Click" IsEnabled="False"/>
                         <Button x:Name="BtnToggle" Content="开始课程" Style="{StaticResource NeonButton}"
                                 Click="BtnToggle_Click"/>
                     </StackPanel>

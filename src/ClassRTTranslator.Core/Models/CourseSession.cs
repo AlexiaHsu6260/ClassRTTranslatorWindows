@@ -13,6 +13,9 @@ public class CourseSession
 
     public List<TranslationEntry> Entries { get; set; } = new();
 
+    /// <summary>本节课同步保存的课堂录音文件路径（WAV，边录边存；无录音时为 null）。</summary>
+    public string? RecordingPath { get; set; }
+
     public TimeSpan Duration => EndDate == default ? TimeSpan.Zero : EndDate - StartDate;
 
     public string DurationString =>

@@ -11,6 +11,7 @@ using ClassRTTranslator.Core.Glossary;
 using ClassRTTranslator.Core.Models;
 using ClassRTTranslator.Core.Review;
 using ClassRTTranslator.Core.Translation;
+using NAudio.Wave;
 
 namespace ClassRTTranslator.App;
 
@@ -38,6 +39,10 @@ public partial class MainWindow : Window
     private SettingsWindow? _settingsWindow;
     private DispatcherTimer? _courseTimer;
     private DateTime _courseStartTime;
+
+    // 课堂录音播放（课后重听）。
+    private AudioFileReader? _playbackReader;
+    private WaveOutEvent? _playbackOutput;
 
     public MainWindow()
     {
@@ -80,7 +85,9 @@ public partial class MainWindow : Window
         _ = _recognizer.StartAsync();
 
         _audioLevel.LevelChanged += OnLevelChanged;
-        _audioLevel.Start();
+        // 边录边存：课程进行中把麦克风音频实时写入 WAV，供课后重听。
+        _audioLevel.Start(BuildRecordingPath());
+        _course.RecordingPath = _audioLevel.LastRecordingPath;
 
         _courseStartTime = DateTime.Now;
         _courseTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -104,9 +111,19 @@ public partial class MainWindow : Window
         if (_course is not null)
         {
             _course.EndDate = DateTime.Now;
+            _course.RecordingPath = _audioLevel.LastRecordingPath;
             LblTimer.Text = _course.DurationString;
         }
         UpdateState(false);
+    }
+
+    /// <summary>生成课堂录音文件保存路径：桌面/课程记录/课堂录音/课堂录音_yyyy-MM-dd_HH-mm-ss.wav。</summary>
+    private string BuildRecordingPath()
+    {
+        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        var folder = Path.Combine(desktop, "课程记录", "课堂录音");
+        var name = $"课堂录音_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.wav";
+        return Path.Combine(folder, name);
     }
 
     private void OnTimerTick(object? sender, EventArgs e)
@@ -123,6 +140,9 @@ public partial class MainWindow : Window
             : new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
         LblStatus.Text = running ? "识别中… 正在实时翻译" : "已停止 — 点击「开始课程」";
         BtnReview.IsEnabled = !running && (_course?.Entries.Count ?? 0) > 0;
+        var hasRecording = _course?.RecordingPath is { } p && !string.IsNullOrEmpty(p) && File.Exists(p);
+        BtnPlayback.IsEnabled = !running && hasRecording;
+        BtnRetranslate.IsEnabled = !running && (_course?.Entries.Count ?? 0) > 0;
         UpdateOverlay();
     }
 
@@ -254,6 +274,106 @@ public partial class MainWindow : Window
         BtnReview.IsEnabled = true;
     }
 
+    // MARK: - 课堂录音重听 / 课后重新翻译
+
+    private void BtnPlayback_Click(object sender, RoutedEventArgs e)
+    {
+        if (_playbackOutput is not null)
+        {
+            StopPlayback();
+            return;
+        }
+
+        var path = _course?.RecordingPath;
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        {
+            MessageBox.Show("未找到本节课的课堂录音文件。\n录音保存在「桌面/课程记录/课堂录音」目录。",
+                "播放录音", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            _playbackReader = new AudioFileReader(path);
+            _playbackOutput = new WaveOutEvent();
+            _playbackOutput.PlaybackStopped += OnPlaybackStopped;
+            _playbackOutput.Init(_playbackReader);
+            _playbackOutput.Play();
+            BtnPlayback.Content = "⏹ 停止播放";
+            LblStatus.Text = $"正在播放课堂录音：{Path.GetFileName(path)}";
+        }
+        catch (Exception ex)
+        {
+            StopPlayback();
+            MessageBox.Show($"无法播放录音：{ex.Message}", "播放录音", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void StopPlayback()
+    {
+        var output = _playbackOutput;
+        _playbackOutput = null;
+        if (output is not null)
+        {
+            output.PlaybackStopped -= OnPlaybackStopped;
+            try { output.Stop(); } catch { /* 忽略 */ }
+            output.Dispose();
+        }
+        _playbackReader?.Dispose();
+        _playbackReader = null;
+        BtnPlayback.Content = "▶ 播放录音";
+    }
+
+    private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        Dispatcher.Invoke(StopPlayback);
+    }
+
+    private async void BtnRetranslate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_course is null || _course.Entries.Count == 0)
+        {
+            MessageBox.Show("当前没有可重新翻译的课程记录。", "重新翻译", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_settings.DeepSeekApiKey))
+        {
+            MessageBox.Show("重新翻译依赖 DeepSeek 在线服务，请先在「设置」中填写 API Key。",
+                "重新翻译", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        BtnRetranslate.IsEnabled = false;
+        LblStatus.Text = "正在用 DeepSeek 重新翻译本节课…（带整课上下文，质量优于实时逐句翻译）";
+        try
+        {
+            var sentences = _course.Entries.Select(x => x.Source).ToList();
+            var context = "这些句子来自同一节英语课的连续课堂记录，按时间顺序排列。" +
+                          "请结合整节课的上下文进行翻译，保持术语、人名与表达前后一致，避免逐句生硬直译，使整体连贯自然。";
+            var results = await DeepSeekTranslationService.TranslateAsync(
+                sentences, _glossary.Terms, _settings.DeepSeekApiKey, context);
+
+            var updated = 0;
+            for (var i = 0; i < _course.Entries.Count && i < results.Count; i++)
+            {
+                if (string.IsNullOrEmpty(results[i])) continue;
+                _course.Entries[i].Target = results[i];
+                if (i < _records.Count) _records[i].Target = results[i];
+                updated++;
+            }
+
+            LblStatus.Text = $"重新翻译完成，已更新 {updated} 条译文（可再次「审阅」生成文档）";
+            MessageBox.Show($"重新翻译完成，共更新 {updated} 条译文。\n可点击「审阅」生成更高质量的审阅文档。",
+                "重新翻译", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            LblStatus.Text = "重新翻译失败";
+            MessageBox.Show(ex.Message, "重新翻译失败", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        BtnRetranslate.IsEnabled = true;
+    }
+
     // MARK: - 设置 / 悬浮窗 / 背景
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
@@ -321,6 +441,7 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _courseTimer?.Stop();
+        StopPlayback();
         _audioLevel.Dispose();
         _ = _recognizer.DisposeAsync();
         _caption?.Close();

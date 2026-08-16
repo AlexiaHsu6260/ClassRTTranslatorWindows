@@ -22,18 +22,25 @@ public static class DeepSeekTranslationService
         PropertyNameCaseInsensitive = true,
     };
 
-    /// <summary>批量翻译英文句子为中文，严格遵循术语表。返回与输入等长的译文列表。</summary>
+    /// <summary>
+    /// 批量翻译英文句子为中文，严格遵循术语表。返回与输入等长的译文列表。
+    /// </summary>
+    /// <param name="courseContext">
+    /// 可选。传整节课的上下文说明（如"这些句子来自同一节课的连续课堂记录"），
+    /// 用于课后重新翻译时提示模型保持术语、人名与前后表达一致，获得比实时逐句翻译更好的质量。
+    /// </param>
     public static async Task<List<string>> TranslateAsync(
         IReadOnlyList<string> sentences,
         IReadOnlyList<GlossaryTerm> glossary,
         string apiKey,
+        string? courseContext = null,
         CancellationToken cancellationToken = default)
     {
         if (sentences.Count == 0) return new List<string>();
         if (string.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("未配置 DeepSeek API Key，请在设置中填写。");
 
-        var systemPrompt = BuildSystemPrompt(glossary);
+        var systemPrompt = BuildSystemPrompt(glossary, courseContext);
         var results = new List<string>();
 
         for (var start = 0; start < sentences.Count; start += MaxBatchSize)
@@ -68,7 +75,7 @@ public static class DeepSeekTranslationService
         return results.Take(sentences.Count).ToList();
     }
 
-    private static string BuildSystemPrompt(IReadOnlyList<GlossaryTerm> glossary)
+    private static string BuildSystemPrompt(IReadOnlyList<GlossaryTerm> glossary, string? courseContext = null)
     {
         var prompt = new StringBuilder(
             "你是一位专业的中英文实时翻译引擎。将用户提供的英文句子翻译成简体中文。" +
@@ -80,6 +87,9 @@ public static class DeepSeekTranslationService
             prompt.Append("\n\n必须遵循以下用户自定义术语表：术语表中出现的英文词汇必须使用指定中文翻译，不得意译或省略：\n")
                 .Append(lines);
         }
+
+        if (!string.IsNullOrWhiteSpace(courseContext))
+            prompt.Append("\n\n").Append(courseContext);
 
         prompt.Append("\n\n严格只输出 JSON，格式：{\"translations\":[\"译文1\",\"译文2\",...]}，" +
                       "译文数量必须与输入句子数量一致，不要输出任何其他文字或 markdown 标记。");
