@@ -1,0 +1,33 @@
+<Window x:Class="ClassRTTranslator.App.Views.CaptionOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="字幕悬浮窗"
+        Width="560" Height="132"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        WindowStartupLocation="Manual" ShowActivated="False">
+    <Border x:Name="RootBorder"
+            Margin="6" CornerRadius="14"
+            Background="#E61A0F3E"
+            BorderBrush="#FF2B9E" BorderThickness="2">
+        <Border.Effect>
+            <DropShadowEffect Color="#FF2B9E" BlurRadius="24" ShadowDepth="0" Opacity="0.7"/>
+        </Border.Effect>
+        <Grid Margin="18,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="TxtSource"
+                       Grid.Row="0"
+                       Foreground="#B8A6FF" FontSize="15"
+                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                       MaxHeight="46" FontFamily="Segoe UI"/>
+            <TextBlock x:Name="TxtTarget"
+                       Grid.Row="1" Margin="0,6,0,0"
+                       Foreground="#F0EFFF" FontSize="19" FontWeight="SemiBold"
+                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                       FontFamily="Microsoft YaHei UI"/>
+        </Grid>
+    </Border>
+</Window>

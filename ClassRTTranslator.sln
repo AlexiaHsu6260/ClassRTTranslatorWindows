@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassRTTranslator.Core", "src\ClassRTTranslator.Core\ClassRTTranslator.Core.csproj", "{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassRTTranslator.App", "src\ClassRTTranslator.App\ClassRTTranslator.App.csproj", "{C9F8A1B2-3D5E-4F6A-8B7C-9D0E1F2A3B4C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F8A1B2-3D5E-4F6A-8B7C-9D0E1F2A3B4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F8A1B2-3D5E-4F6A-8B7C-9D0E1F2A3B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F8A1B2-3D5E-4F6A-8B7C-9D0E1F2A3B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F8A1B2-3D5E-4F6A-8B7C-9D0E1F2A3B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

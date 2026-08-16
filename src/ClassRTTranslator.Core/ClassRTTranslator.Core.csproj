@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>ClassRTTranslator.Core</RootNamespace>
+    <AssemblyName>ClassRTTranslator.Core</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ProjectGuid>{B8E7F0A1-2C4D-4E5F-9A6B-7C8D9E0F1A2B}</ProjectGuid>
+  </PropertyGroup>
+
+</Project>

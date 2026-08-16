@@ -1,0 +1,89 @@
+<Window x:Class="ClassRTTranslator.App.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置 · CLASSRT 2077"
+        Width="540" Height="620"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="18">
+        <StackPanel>
+
+            <!-- DeepSeek API Key -->
+            <TextBlock Text="DeepSeek API Key（翻译与审阅共用）" Style="{StaticResource SectionTitleStyle}"/>
+            <PasswordBox x:Name="TxtApiKey" Height="30" PasswordChanged="TxtApiKey_PasswordChanged"/>
+            <TextBlock Text="可在 https://platform.deepseek.com 获取。密钥仅保存在本机。" 
+                       Foreground="{StaticResource TextDimBrush}" FontSize="12" Margin="0,4,0,14"
+                       TextWrapping="Wrap"/>
+
+            <!-- 悬浮窗 -->
+            <TextBlock Text="悬浮字幕窗" Style="{StaticResource SectionTitleStyle}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <CheckBox x:Name="ChkOverlay" Content="显示悬浮字幕窗" Foreground="{StaticResource TextMainBrush}"
+                          Checked="ChkOverlay_Changed" Unchecked="ChkOverlay_Changed"/>
+            </StackPanel>
+            <DockPanel Margin="0,0,0,16">
+                <TextBlock Text="透明度" Foreground="{StaticResource TextMainBrush}" DockPanel.Dock="Left" VerticalAlignment="Center" Width="52"/>
+                <TextBlock x:Name="LblOpacity" Foreground="{StaticResource AccentCyanBrush}" DockPanel.Dock="Right" TextAlignment="Right" VerticalAlignment="Center" Width="36"/>
+                <Slider x:Name="SldOpacity" Minimum="0.3" Maximum="1.0" TickFrequency="0.05"
+                        IsSnapToTickEnabled="True" ValueChanged="SldOpacity_ValueChanged"/>
+            </DockPanel>
+
+            <!-- 背景图 -->
+            <TextBlock Text="主窗口背景图" Style="{StaticResource SectionTitleStyle}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <Button x:Name="BtnPickBackground" Content="选择图片…" Style="{StaticResource NeonButton}"
+                        Click="BtnPickBackground_Click"/>
+                <Button x:Name="BtnClearBackground" Content="清除" Style="{StaticResource NeonButton}" Margin="8,0,0,0"
+                        Click="BtnClearBackground_Click"/>
+                <TextBlock x:Name="LblBackground" Foreground="{StaticResource TextDimBrush}" FontSize="12"
+                           VerticalAlignment="Center" Margin="10,0,0,0" Text="未设置"/>
+            </StackPanel>
+
+            <!-- 术语表 -->
+            <TextBlock Text="术语表（DeepSeek 翻译时强制遵循）" Style="{StaticResource SectionTitleStyle}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBox x:Name="TxtTermSource" Grid.Row="0" Grid.Column="0" Margin="0,0,6,6"
+                         ToolTip="英文原词"/>
+                <TextBox x:Name="TxtTermTarget" Grid.Row="0" Grid.Column="1" Margin="0,0,6,6"
+                         ToolTip="中文译词"/>
+                <Button x:Name="BtnAddTerm" Grid.Row="0" Grid.Column="2" Content="添加" Style="{StaticResource NeonButton}"
+                        Click="BtnAddTerm_Click"/>
+                <Button x:Name="BtnImportTerm" Grid.Row="1" Grid.Column="0" Content="从 Markdown 导入…"
+                        Style="{StaticResource NeonButton}" Margin="0,0,6,6" Click="BtnImportTerm_Click"/>
+                <Button x:Name="BtnRemoveTerm" Grid.Row="1" Grid.Column="1" Content="删除选中"
+                        Style="{StaticResource NeonButton}" Margin="0,0,6,6" Click="BtnRemoveTerm_Click"/>
+                <Button x:Name="BtnClearTerms" Grid.Row="1" Grid.Column="2" Content="清空"
+                        Style="{StaticResource NeonButton}" Click="BtnClearTerms_Click"/>
+            </Grid>
+            <TextBlock Text="支持从 Markdown 表格词库导入（| 英文 | 中文 | 注释 |），与 macOS 版格式一致。"
+                       Foreground="{StaticResource TextDimBrush}" FontSize="12" Margin="0,0,0,8"
+                       TextWrapping="Wrap"/>
+            <ListBox x:Name="ListTerms" Height="170" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     SelectionMode="Single">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentCyanBrush}" FontWeight="Bold"/>
+                            <TextBlock Text=" → " Foreground="{StaticResource TextDimBrush}"/>
+                            <TextBlock Text="{Binding Target}" Foreground="{StaticResource TextMainBrush}"/>
+                            <TextBlock Text="{Binding Note, StringFormat=  ·  {0}}" Foreground="{StaticResource TextDimBrush}" FontSize="11"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock x:Name="LblStatus" Foreground="{StaticResource AccentYellowBrush}" FontSize="12"
+                       Margin="0,8,0,0" Text=""/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

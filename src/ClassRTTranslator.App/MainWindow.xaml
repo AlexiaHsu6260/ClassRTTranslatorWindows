@@ -1,0 +1,145 @@
+<Window x:Class="ClassRTTranslator.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CLASSRT TRANSLATOR 2077"
+        Width="980" Height="680"
+        MinWidth="760" MinHeight="520"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}">
+
+    <Grid>
+        <Grid.Background>
+            <ImageBrush x:Name="BgImage" Stretch="UniformToFill" Opacity="0.22">
+                <ImageBrush.RelativeTransform>
+                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.2" ScaleY="1.2"/>
+                </ImageBrush.RelativeTransform>
+            </ImageBrush>
+        </Grid.Background>
+
+        <Border Background="#E60D0221" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- ===== 标题栏 ===== -->
+                <DockPanel Grid.Row="0" Margin="0,0,0,14">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <Ellipse Width="14" Height="14" Fill="{StaticResource AccentPinkBrush}" VerticalAlignment="Center">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="#FF2B9E" BlurRadius="18" ShadowDepth="0" Opacity="0.9"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+                        <TextBlock Text="CLASSRT TRANSLATOR 2077" FontSize="20" FontWeight="Bold"
+                                   Foreground="{StaticResource TextMainBrush}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="· WINDOWS EDITION" FontSize="12"
+                                   Foreground="{StaticResource AccentCyanBrush}" Margin="10,4,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <Button x:Name="BtnSettings" Content="⚙ 设置" Style="{StaticResource NeonButton}"
+                                Margin="0,0,8,0" Click="BtnSettings_Click"/>
+                        <Button x:Name="BtnReview" Content="审阅" Style="{StaticResource NeonButton}"
+                                Margin="0,0,8,0" Click="BtnReview_Click" IsEnabled="False"/>
+                        <Button x:Name="BtnToggle" Content="开始课程" Style="{StaticResource NeonButton}"
+                                Click="BtnToggle_Click"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- ===== 状态条 ===== -->
+                <Border Grid.Row="1" CornerRadius="8" Background="{StaticResource BgPanelBrush}"
+                        BorderBrush="#3A2E6E" BorderThickness="1" Padding="12,6" Margin="0,0,0,12">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Ellipse x:Name="DotStatus" Width="10" Height="10" Fill="#555"
+                                     VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock x:Name="LblStatus" Text="就绪 — 点击「开始课程」" Foreground="{StaticResource TextDimBrush}"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <TextBlock Text="引擎：" Foreground="{StaticResource TextDimBrush}" FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Text="DeepSeek 在线翻译" Foreground="{StaticResource AccentYellowBrush}" FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="LblTimer" Text="00:00:00" Foreground="{StaticResource AccentCyanBrush}"
+                                       FontSize="14" FontFamily="Consolas" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                            <TextBlock x:Name="LblCount" Text="0 条" Foreground="{StaticResource TextDimBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- ===== 记录列表 ===== -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="时间" Foreground="{StaticResource TextDimBrush}" FontSize="12"/>
+                        <TextBlock Text="英文原文" Grid.Column="1" Foreground="{StaticResource TextDimBrush}" FontSize="12"/>
+                        <TextBlock Text="中文译文" Grid.Column="2" Foreground="{StaticResource TextDimBrush}" FontSize="12"/>
+                    </Grid>
+                    <ListBox x:Name="ListRecords" Grid.Row="1" BorderThickness="0" Background="Transparent"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Focusable" Value="False"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#2A2060" BorderThickness="0,0,0,1" Padding="4,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Time}" Foreground="#6F6A92" FontFamily="Consolas" FontSize="12"
+                                                   VerticalAlignment="Top"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Source}" Foreground="#C9C3F5" TextWrapping="Wrap"
+                                                   Margin="0,0,14,0" FontSize="14"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Target}" Foreground="{StaticResource TextMainBrush}"
+                                                   TextWrapping="Wrap" FontSize="14"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <!-- ===== 底部电平条 ===== -->
+                <Border Grid.Row="3" Margin="0,14,0,0" CornerRadius="8" Background="{StaticResource BgPanelBrush}"
+                        BorderBrush="#3A2E6E" BorderThickness="1" Padding="12,8">
+                    <DockPanel>
+                        <TextBlock Text="麦克风电平" Foreground="{StaticResource TextDimBrush}" FontSize="12"
+                                   VerticalAlignment="Center" DockPanel.Dock="Left" Margin="0,0,12,0"/>
+                        <Border DockPanel.Dock="Left" Width="220" Height="10" CornerRadius="5" Background="#1A0F3E" VerticalAlignment="Center">
+                            <Border x:Name="BarLevel" Width="0" HorizontalAlignment="Left" CornerRadius="5">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#FF2B9E" Offset="0"/>
+                                        <GradientStop Color="#00F0FF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </Border>
+                        <TextBlock x:Name="LblHint" Text="提示：识别需要英语（美国）语言包；未配置 API Key 时翻译不可用。"
+                                   Foreground="{StaticResource TextDimBrush}" FontSize="11" Margin="12,0,0,0"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
