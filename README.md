@@ -45,6 +45,16 @@ dotnet restore ClassRTTranslator.sln
 dotnet build ClassRTTranslator.sln -c Release
 ```
 
+## 打包与发布
+
+在 Windows 上把应用整理为可分发包（单文件 exe + zip + SHA256），参见 [RELEASE.md](RELEASE.md)。一键打包：
+
+```powershell
+.\build-release.ps1
+```
+
+产物生成到 `dist\`（`ClassRTTranslator-Windows-x64.zip` 即分发包，解压即可运行）。
+
 ## 使用步骤
 
 1. 首次启动如提示麦克风权限，请允许；若误拒，前往 设置 → 隐私和安全性 → 麦克风 允许
@@ -54,19 +64,6 @@ dotnet build ClassRTTranslator.sln -c Release
    - 可选：设置背景图、悬浮窗透明度
 3. 回到主窗口点击「开始课程」，对着麦克风说英语，即实时显示中文译文
 4. 点击「停止课程」后，可点击「审阅」生成课堂审阅 HTML 文档（保存到 `桌面/课程记录/`）
-
-## 与 macOS 版的功能对照
-
-| 功能 | macOS 版 | Windows 版 |
-|---|---|---|
-| 语音识别 | SFSpeechRecognizer（本地离线） | Windows 系统识别（WinRT，英语） |
-| 实时翻译 | 系统离线翻译 / DeepSeek | DeepSeek 在线翻译 |
-| 悬浮字幕窗 | NSPanel | WPF 置顶透明窗 |
-| 术语表 | ✅（Markdown 导入） | ✅（同格式） |
-| 课程审阅 HTML | ✅ | ✅ |
-| 自定义背景 | ✅ | ✅ |
-| 电平指示 | ✅ | ✅（NAudio） |
-| 输入设备切换 | ✅（CoreAudio） | ⏳ 待实现（仅枚举） |
 
 ## 已知限制与后续路线
 
